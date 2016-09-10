@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.util.StringBuilderPrinter;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,11 +35,32 @@ public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback 
     public String translink_url = "https://www.opendatani.gov.uk/dataset/76fb7478-cc19-4254-af3c-b269596bc711/resource/fe49e26a-7324-4644-9a61-bd736aa5e8fc/download/translink-stations-ni.geojson";
     public String events_url = "http://www.belfastcity.gov.uk/events/events-RSS.aspx";
 
+    private boolean load_toilets = false;
+    private boolean load_transport = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tourism__map);
+        setContentView(R.layout.menu);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+    }
+
+    public void select(View view) {
+        setContentView(R.layout.selection);
+    }
+
+    public void transport(View view) {
+        load_transport = true;
+        doTheThing();
+    }
+
+    public void toilets(View view) {
+        load_toilets = true;
+        doTheThing();
+    }
+
+    private void doTheThing() {
+        setContentView(R.layout.activity_tourism__map);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -79,36 +102,40 @@ public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback 
             Log.e("that", e.getMessage());
         }
 
-        for (String i : toiletData) {
-            String[] words = i.split(",");
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.title(words[0]);
-            markerOptions.snippet("Public Toilet");
-            markerOptions.position(new LatLng(Double.parseDouble(words[6]), Double.parseDouble(words[5])));
-            googleMap.addMarker(markerOptions);
+        if (load_toilets) {
+            for (String i : toiletData) {
+                String[] words = i.split(",");
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.title(words[0]);
+                markerOptions.snippet("Public Toilet");
+                markerOptions.position(new LatLng(Double.parseDouble(words[6]), Double.parseDouble(words[5])));
+                googleMap.addMarker(markerOptions);
+            }
         }
 
         JSONArray stations = translinkData.optJSONArray("features");
 
-        try {
-            for (int i = 0; i < stations.length(); i++) {
-                JSONObject station = stations.getJSONObject(i);
-                JSONObject station_props = station.optJSONObject("properties");
-                String name = station_props.optString("Station");
-                String type = station_props.optString("Type").equals("R") ? "Rail" : "Bus";
+        if (load_transport) {
+            try {
+                for (int i = 0; i < stations.length(); i++) {
+                    JSONObject station = stations.getJSONObject(i);
+                    JSONObject station_props = station.optJSONObject("properties");
+                    String name = station_props.optString("Station");
+                    String type = station_props.optString("Type").equals("R") ? "Rail" : "Bus";
 
-                JSONArray json_coords = station.optJSONObject("geometry").optJSONArray("coordinates");
-                LatLng latLng = new LatLng(json_coords.getDouble(1), json_coords.getDouble(0));
+                    JSONArray json_coords = station.optJSONObject("geometry").optJSONArray("coordinates");
+                    LatLng latLng = new LatLng(json_coords.getDouble(1), json_coords.getDouble(0));
 
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.title(name);
-                markerOptions.snippet(type + " Station");
-                markerOptions.position(latLng);
-                googleMap.addMarker(markerOptions);
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.title(name);
+                    markerOptions.snippet(type + " Station");
+                    markerOptions.position(latLng);
+                    googleMap.addMarker(markerOptions);
+                }
             }
-        }
-        catch (JSONException e) {
-            Log.e("error", e.getMessage());
+            catch (JSONException e) {
+                Log.e("error", e.getMessage());
+            }
         }
     }
 }
