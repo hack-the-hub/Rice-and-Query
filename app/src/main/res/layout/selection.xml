@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/backg"
+        android:id="@+id/imageView2"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="0dp"
+        android:layout_alignParentTop="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="129dp"
+        android:layout_height="wrap_content"
+        android:text="Local Toilets"
+        android:id="@+id/button2"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="255dp"
+        android:textColor="@android:color/white"
+        android:textColorHighlight="#d71212"
+        android:clickable="true"
+        android:onClick="toilets"
+        android:background="@android:color/transparent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="174dp" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Transport"
+        android:id="@+id/button"
+        android:layout_above="@+id/button2"
+        android:layout_centerHorizontal="true"
+        android:clickable="true"
+        android:textColor="@android:color/white"
+        android:onClick="transport"
+        android:background="@android:color/transparent" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="129dp"
+        android:layout_height="wrap_content"
+        android:text="Hotels"
+        android:id="@+id/button3"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="255dp"
+        android:textColor="@android:color/white"
+        android:textColorHighlight="#d71212"
+        android:clickable="true"
+        android:onClick="toilets"
+        android:background="@android:color/transparent"
+        android:layout_above="@+id/button"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="129dp"
+        android:layout_height="wrap_content"
+        android:text="Shopping Centre"
+        android:id="@+id/button4"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="255dp"
+        android:textColor="@android:color/white"
+        android:textColorHighlight="#d71212"
+        android:clickable="true"
+        android:onClick="toilets"
+        android:background="@android:color/transparent"
+        android:layout_above="@+id/button3"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>
