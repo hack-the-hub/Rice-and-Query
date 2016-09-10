@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback {
@@ -52,33 +54,43 @@ public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback 
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        LatLng sydney = new LatLng(54, -5);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
+        List<String> data = new ArrayList<>();
         try {
             URL url = new URL(toilet_url);
-            String data = new ApiFetch().execute(url).get();
-            Log.i("this", data);
+            data = new ApiFetch().execute(url).get();
+            Log.i("this", data.toString());
         } catch (java.io.IOException | InterruptedException | ExecutionException e) {
             Log.e("that", e.getMessage());
         }
+
+        for (String i : data) {
+            String[] words = i.split(",");
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.title(words[0]);
+            markerOptions.position(new LatLng(Double.parseDouble(words[6]), Double.parseDouble(words[5])));
+            mMap.addMarker(markerOptions);
+        }
+
+
     }
 }
 
-class ApiFetch extends AsyncTask<URL, Void, String> {
-    protected String doInBackground(URL... urls) {
+class ApiFetch extends AsyncTask<URL, Void, List<String>> {
+    protected List<String> doInBackground(URL... urls) {
         try {
             URL url = urls[0];
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            StringBuilder sb = new StringBuilder();
+            List<String> list = new ArrayList<>();
             BufferedReader r = new BufferedReader(new InputStreamReader(in),1000);
             for (String line = r.readLine(); line != null; line =r.readLine()){
-                sb.append(line);
+                list.add(line);
             }
             in.close();
-            return sb.toString();
+            return list.subList(1, list.size()-1);
         }
         catch (IOException e) {
             Log.e("tag", e.getMessage());
