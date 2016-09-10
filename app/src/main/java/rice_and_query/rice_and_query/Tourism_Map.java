@@ -1,12 +1,10 @@
 package rice_and_query.rice_and_query;
 
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.util.StringBuilderPrinter;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -65,12 +63,18 @@ public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback 
 
         List<String> toiletData = new ArrayList<>();
         JSONObject translinkData = new JSONObject();
+
         try {
             URL url = new URL(toilet_url);
             toiletData = new ApiFetchCsv().execute(url).get();
             url = new URL(translink_url);
             translinkData = new ApiFetchJson().execute(url).get();
             Log.i("this", toiletData.toString());
+            HandleXML event = new HandleXML(events_url);
+            event.fetchXML();
+
+            while(event.parsingComplete);
+
         } catch (java.io.IOException | InterruptedException | ExecutionException e) {
             Log.e("that", e.getMessage());
         }
