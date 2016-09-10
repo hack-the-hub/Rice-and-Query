@@ -11,6 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -109,6 +110,7 @@ public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback 
                 markerOptions.title(words[0]);
                 markerOptions.snippet("Public Toilet");
                 markerOptions.position(new LatLng(Double.parseDouble(words[6]), Double.parseDouble(words[5])));
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
                 googleMap.addMarker(markerOptions);
             }
         }
@@ -130,6 +132,7 @@ public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback 
                     markerOptions.title(name);
                     markerOptions.snippet(type + " Station");
                     markerOptions.position(latLng);
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
                     googleMap.addMarker(markerOptions);
                 }
             }
