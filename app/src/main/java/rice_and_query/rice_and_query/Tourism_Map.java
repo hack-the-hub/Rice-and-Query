@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.StringBuilderPrinter;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -56,7 +57,9 @@ public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback 
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        LatLng sydney = new LatLng(54, -5);
+
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(54.5968, -6.80);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
         List<String> toiletData = new ArrayList<>();
