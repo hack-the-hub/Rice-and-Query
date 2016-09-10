@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
+import android.util.StringBuilderPrinter;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -12,6 +12,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -26,8 +30,8 @@ import java.util.concurrent.ExecutionException;
 
 public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
     public String toilet_url = "http://www.belfastcity.gov.uk/nmsruntime/saveasdialog.aspx?lID=15256&sID=2430";
+    public String translink_url = "https://www.opendatani.gov.uk/dataset/76fb7478-cc19-4254-af3c-b269596bc711/resource/fe49e26a-7324-4644-9a61-bd736aa5e8fc/download/translink-stations-ni.geojson";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,34 +55,57 @@ public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback 
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(54, -5);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-        List<String> data = new ArrayList<>();
+        List<String> toiletData = new ArrayList<>();
+        JSONObject translinkData = new JSONObject();
         try {
             URL url = new URL(toilet_url);
-            data = new ApiFetch().execute(url).get();
-            Log.i("this", data.toString());
+            toiletData = new ApiFetchCsv().execute(url).get();
+            url = new URL(translink_url);
+            translinkData = new ApiFetchJson().execute(url).get();
+            Log.i("this", toiletData.toString());
         } catch (java.io.IOException | InterruptedException | ExecutionException e) {
             Log.e("that", e.getMessage());
         }
 
-        for (String i : data) {
+        for (String i : toiletData) {
             String[] words = i.split(",");
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.title(words[0]);
+            markerOptions.snippet("Public Toilet");
             markerOptions.position(new LatLng(Double.parseDouble(words[6]), Double.parseDouble(words[5])));
-            mMap.addMarker(markerOptions);
+            googleMap.addMarker(markerOptions);
         }
 
+        JSONArray stations = translinkData.optJSONArray("features");
 
+        try {
+            for (int i = 0; i < stations.length(); i++) {
+                JSONObject station = stations.getJSONObject(i);
+                JSONObject station_props = station.optJSONObject("properties");
+                String name = station_props.optString("Station");
+                String type = station_props.optString("Type").equals("R") ? "Rail" : "Bus";
+
+                JSONArray json_coords = station.optJSONObject("geometry").optJSONArray("coordinates");
+                LatLng latLng = new LatLng(json_coords.getDouble(1), json_coords.getDouble(0));
+
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.title(name);
+                markerOptions.snippet(type + " Station");
+                markerOptions.position(latLng);
+                googleMap.addMarker(markerOptions);
+            }
+        }
+        catch (JSONException e) {
+            Log.e("error", e.getMessage());
+        }
     }
 }
 
-class ApiFetch extends AsyncTask<URL, Void, List<String>> {
+class ApiFetchCsv extends AsyncTask<URL, Void, List<String>> {
     protected List<String> doInBackground(URL... urls) {
         try {
             URL url = urls[0];
@@ -91,6 +118,37 @@ class ApiFetch extends AsyncTask<URL, Void, List<String>> {
             }
             in.close();
             return list.subList(1, list.size()-1);
+        }
+        catch (IOException e) {
+            Log.e("tag", e.getMessage());
+            return null;
+        }
+    }
+}
+
+class ApiFetchJson extends AsyncTask<URL, Void, JSONObject> {
+    protected JSONObject doInBackground(URL... urls) {
+        try {
+            URL url = urls[0];
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            StringBuilder stringBuilder = new StringBuilder();
+            BufferedReader r = new BufferedReader(new InputStreamReader(in),1000);
+            for (String line = r.readLine(); line != null; line =r.readLine()){
+                stringBuilder.append(line);
+                stringBuilder.append('\n');
+            }
+            String json_string = stringBuilder.toString();
+            JSONObject json = new JSONObject();
+            try {
+                json = new JSONObject(json_string);
+            }
+            catch (JSONException e) {
+                Log.e("error", e.getMessage());
+            }
+
+            in.close();
+            return json;
         }
         catch (IOException e) {
             Log.e("tag", e.getMessage());
