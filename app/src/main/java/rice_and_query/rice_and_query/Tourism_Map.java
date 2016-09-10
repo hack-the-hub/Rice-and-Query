@@ -33,6 +33,7 @@ public class Tourism_Map extends FragmentActivity implements OnMapReadyCallback 
 
     public String toilet_url = "http://www.belfastcity.gov.uk/nmsruntime/saveasdialog.aspx?lID=15256&sID=2430";
     public String translink_url = "https://www.opendatani.gov.uk/dataset/76fb7478-cc19-4254-af3c-b269596bc711/resource/fe49e26a-7324-4644-9a61-bd736aa5e8fc/download/translink-stations-ni.geojson";
+    public String events_url = "http://www.belfastcity.gov.uk/events/events-RSS.aspx";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
